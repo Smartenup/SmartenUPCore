@@ -1,0 +1,9 @@
+﻿Group: SmartenUP
+FriendlyName: SmartenUP.Core
+SystemName: SmartenUP.Core
+Version: 1.00
+SupportedVersions: 3.80
+Author: SmartenUP Team - Pedro Usinskas
+DisplayOrder: -1
+FileName: SmartenUP.Core.dll
+Description: This plugin allows new feactures to nop commerce
