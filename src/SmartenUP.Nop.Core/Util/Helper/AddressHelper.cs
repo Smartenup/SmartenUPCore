@@ -1,4 +1,5 @@
 ﻿using Nop.Core;
+using Nop.Core.Domain.Common;
 using Nop.Services.Common;
 using Nop.Services.Localization;
 using System;
@@ -69,6 +70,34 @@ namespace SmartenUP.Core.Util.Helper
         }
 
 
+        public void GetCustomNumberAndComplement(string customAttributes, out string number, out string complement, out string cnpjcpf)
+        {
+            GetCustomNumberAndComplement(customAttributes, out number, out complement);
+
+            cnpjcpf = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(customAttributes))
+            {
+                return;
+            }
+
+            var attributes = _addressAttributeParser.ParseAddressAttributes(customAttributes);
+
+            for (int i = 0; i < attributes.Count; i++)
+            {
+                var valuesStr = _addressAttributeParser.ParseValues(customAttributes, attributes[i].Id);
+
+                var attributeName = attributes[i].GetLocalized(a => a.Name, _workContext.WorkingLanguage.Id);
+
+                if (attributeName.Equals("CPF/CNPJ", StringComparison.InvariantCultureIgnoreCase))
+                    cnpjcpf = _addressAttributeParser.ParseValues(customAttributes, attributes[i].Id)[0];
+            }
+
+            if (!string.IsNullOrWhiteSpace(cnpjcpf))
+                cnpjcpf = NumberHelper.ObterApenasNumeros(cnpjcpf);
+        }
+
+
         public static string FormatarCelular(string telefone)
         {
             string numero = string.Empty;
@@ -105,6 +134,57 @@ namespace SmartenUP.Core.Util.Helper
             return retorno;
         }
 
+        public static string ObterNumeroTelefone(string telefoneFormatadoApenasNumeros)
+        {
+            var phoneNumber = NumberHelper.ObterApenasNumeros(telefoneFormatadoApenasNumeros);
+
+            string numero = string.Empty;
+            string retorno = string.Empty;
+
+            if (phoneNumber.Length <= PHONE_WITHOUT_AREA_CODE_MAX_LENGTH)
+            {
+                numero = phoneNumber;
+            }
+            else if ((phoneNumber.Length > PHONE_WITHOUT_AREA_CODE_MAX_LENGTH) &&
+                    (phoneNumber.Length <= PHONE_ONLY_NUMBER_ONE_MAX_LENGTH))
+            {
+                numero = phoneNumber.Substring(2);
+            }
+
+            while (numero.Length != PHONE_WITHOUT_AREA_CODE_MAX_LENGTH)
+                numero = "0" + numero;
+
+            retorno = numero;
+
+            return retorno;
+        }
+
+        public static string ObterAreaTelefone(string telefoneFormatadoApenasNumeros)
+        {
+
+            var phoneNumber = NumberHelper.ObterApenasNumeros(telefoneFormatadoApenasNumeros);
+
+            string codigoArea = string.Empty;
+            string retorno = string.Empty;
+
+            if (phoneNumber.Length <= PHONE_WITHOUT_AREA_CODE_MAX_LENGTH)
+            {
+                codigoArea = "00";
+            }
+            else if ((phoneNumber.Length > PHONE_WITHOUT_AREA_CODE_MAX_LENGTH) &&
+                    (phoneNumber.Length <= PHONE_ONLY_NUMBER_ONE_MAX_LENGTH))
+            {
+                codigoArea = phoneNumber.Substring(0, 2);
+            }
+
+            while (codigoArea.Length != 2)
+                codigoArea = "0" + codigoArea;
+
+            retorno = codigoArea;
+
+            return retorno;
+        }
+
 
         public static string RemoverCodigoAreaIncorreto(string telefoneCompleto)
         {
@@ -119,6 +199,43 @@ namespace SmartenUP.Core.Util.Helper
             }
 
             return telefoneCompleto;
+        }
+
+        public static string GetFullName(Address address, int length = 50)
+        {
+            if (address == null)
+            {
+                throw new ArgumentNullException("address");
+            }
+
+            var firstName = address.FirstName;
+            var lastName = address.LastName;
+            var stringWithTwoOrMoreSpace = "";
+
+            if (!string.IsNullOrWhiteSpace(firstName) && !string.IsNullOrWhiteSpace(lastName))
+            {
+                stringWithTwoOrMoreSpace = string.Format("{0} {1}", firstName, lastName);
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(firstName))
+                {
+                    stringWithTwoOrMoreSpace = firstName;
+                }
+                if (!string.IsNullOrWhiteSpace(lastName))
+                {
+                    stringWithTwoOrMoreSpace = lastName;
+                }
+            }
+
+            var billingShippingFullName = StringHelper.RemoveIncorrectSpaces(stringWithTwoOrMoreSpace);
+
+            if (billingShippingFullName.Length > length)
+            {
+                billingShippingFullName = billingShippingFullName.Substring(0, length);
+            }
+
+            return billingShippingFullName;
         }
     }
 }

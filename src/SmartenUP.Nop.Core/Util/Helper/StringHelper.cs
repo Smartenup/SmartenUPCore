@@ -24,5 +24,22 @@
 
             return resultado;
         }
+
+        public static string RemoveIncorrectSpaces(string stringWithTwoOrMoreSpace)
+        {
+            var str = string.Empty;
+            for (var i = 0; i < stringWithTwoOrMoreSpace.Length; i++)
+                if (stringWithTwoOrMoreSpace[i] == ' ')
+                {
+                    if ((i + 1 < stringWithTwoOrMoreSpace.Length) && (stringWithTwoOrMoreSpace[i + 1] != ' '))
+                    {
+                        str = str + stringWithTwoOrMoreSpace[i];
+                    }
+                }
+                else
+                    str = str + stringWithTwoOrMoreSpace[i];
+            return str.Trim();
+        }
+
     }
 }

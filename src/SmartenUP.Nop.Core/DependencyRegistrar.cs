@@ -19,6 +19,7 @@ namespace SmartenUP.Core
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
             builder.RegisterType<HolidayService>().As<IHolidayService>().InstancePerLifetimeScope();
+            builder.RegisterType<OrderNoteService>().As<IOrderNoteService>().InstancePerLifetimeScope();
 
             //data context
             this.RegisterPluginDataContext<SmartenUPObjectContext>(builder, "nop_object_context_smartenupcore");
