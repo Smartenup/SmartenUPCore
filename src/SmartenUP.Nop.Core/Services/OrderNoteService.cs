@@ -29,7 +29,8 @@ namespace SmartenUP.Core.Services
             IWorkflowMessageService workflowMessageService,
             IWorkContext workContext,
             IShippingService shippingService,
-            IHolidayService holidayService)
+            IHolidayService holidayService,
+            ILogger logger)
         {
             _workContext = workContext;
             _orderService = orderService;
@@ -37,6 +38,7 @@ namespace SmartenUP.Core.Services
             _workflowMessageService = workflowMessageService;
             _shippingService = shippingService;
             _holidayService = holidayService;
+            _logger = logger;
         }
 
         public void AddOrderNote(string note, bool showNoteToCustomer, Order order, bool sendEmail = false)
