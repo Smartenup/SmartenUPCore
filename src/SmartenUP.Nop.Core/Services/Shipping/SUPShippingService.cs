@@ -106,8 +106,8 @@ namespace SmartenUP.Core.Services.Shippping
 
             bool shippingFromMultipleLocations;
             var shippingOptionRequests = CreateShippingOptionRequests(order, out shippingFromMultipleLocations);
-
-            IShippingRateComputationMethod shippingRateComputationMethod = LoadShippingRateComputationMethodBySystemName(order.ShippingRateComputationMethodSystemName);
+            
+            ISUPShippingRateComputationMethod shippingRateComputationMethod = LoadSUPShippingRateComputationMethodBySystemName(order.ShippingRateComputationMethodSystemName);
 
             if (shippingRateComputationMethod == null)
                 throw new NopException("Shipping rate computation method could not be loaded");
@@ -248,6 +248,7 @@ namespace SmartenUP.Core.Services.Shippping
                     request.StoreId = order.StoreId;
                     //add item
                     request.SUPItems.Add(new SUPGetShippingOptionRequest.SUPPackageItem(item));
+
                     //customer
                     request.Customer = order.Customer;
                     //ship to
@@ -542,13 +543,11 @@ namespace SmartenUP.Core.Services.Shippping
 
             result.ShippingFromMultipleLocations = false;
 
-            IList<ISUPShippingRateComputationMethod> shippingRateComputationMethods = LoadActiveShippingRateComputationMethods(storeId);
+            IList<ISUPShippingRateComputationMethod> shippingRateComputationMethods = LoadActiveSUPShippingRateComputationMethods(storeId);
 
             if (!shippingRateComputationMethods.Any())
                 //throw new NopException("Shipping rate computation method could not be loaded");
                 return result;
-
-
 
             //request shipping options from each shipping rate computation methods
             foreach (var srcm in shippingRateComputationMethods)
@@ -805,9 +804,9 @@ namespace SmartenUP.Core.Services.Shippping
         /// </summary>
         /// <param name="storeId">Load records allowed only in a specified store; pass 0 to load all records</param>
         /// <returns>Shipping rate computation methods</returns>
-        public virtual IList<ISUPShippingRateComputationMethod> LoadActiveShippingRateComputationMethods(int storeId = 0)
+        public virtual IList<ISUPShippingRateComputationMethod> LoadActiveSUPShippingRateComputationMethods(int storeId = 0)
         {
-            return LoadAllShippingRateComputationMethods(storeId)
+            return LoadAllSUPShippingRateComputationMethods(storeId)
                    .Where(provider => _shippingSettings.ActiveShippingRateComputationMethodSystemNames.Contains(provider.PluginDescriptor.SystemName, StringComparer.InvariantCultureIgnoreCase))
                    .ToList();
         }
@@ -818,9 +817,24 @@ namespace SmartenUP.Core.Services.Shippping
         /// </summary>
         /// <param name="storeId">Load records allowed only in a specified store; pass 0 to load all records</param>
         /// <returns>Shipping rate computation methods</returns>
-        public virtual IList<ISUPShippingRateComputationMethod> LoadAllShippingRateComputationMethods(int storeId = 0)
+        public virtual IList<ISUPShippingRateComputationMethod> LoadAllSUPShippingRateComputationMethods(int storeId = 0)
         {
             return _pluginFinder.GetPlugins<ISUPShippingRateComputationMethod>(storeId: storeId).ToList();
+        }
+
+
+        /// <summary>
+        /// Load shipping rate computation method by system name
+        /// </summary>
+        /// <param name="systemName">System name</param>
+        /// <returns>Found Shipping rate computation method</returns>
+        public virtual ISUPShippingRateComputationMethod LoadSUPShippingRateComputationMethodBySystemName(string systemName)
+        {
+            var descriptor = _pluginFinder.GetPluginDescriptorBySystemName<ISUPShippingRateComputationMethod>(systemName);
+            if (descriptor != null)
+                return descriptor.Instance<ISUPShippingRateComputationMethod>();
+
+            return null;
         }
     }
 }

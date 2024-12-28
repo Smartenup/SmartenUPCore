@@ -2,14 +2,17 @@
 using Nop.Services.Shipping;
 using System.Collections.Generic;
 
+
 namespace SmartenUP.Core.Services.Shippping
 {
     public partial class SUPGetShippingOptionRequest : GetShippingOptionRequest
     {
 
-        public SUPGetShippingOptionRequest() { 
-
+        public SUPGetShippingOptionRequest() {
+            SUPItems = new List<SUPPackageItem>();
         }
+
+
         public SUPGetShippingOptionRequest(GetShippingOptionRequest request)
         {
             Customer = request.Customer;
@@ -35,6 +38,9 @@ namespace SmartenUP.Core.Services.Shippping
                     );
             }
         }
+
+        
+
 
         private bool _isOrderBasead = false;
 
