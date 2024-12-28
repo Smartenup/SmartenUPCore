@@ -9,6 +9,7 @@ using Nop.Web.Framework.Mvc;
 using SmartenUP.Core.Data;
 using SmartenUP.Core.Domain;
 using SmartenUP.Core.Services;
+using SmartenUP.Core.Services.Shippping;
 
 namespace SmartenUP.Core
 {
@@ -18,6 +19,8 @@ namespace SmartenUP.Core
 
         public void Register(ContainerBuilder builder, ITypeFinder typeFinder, NopConfig config)
         {
+            builder.RegisterType<SUPShippingService>().As<ISUPShippingService>().InstancePerLifetimeScope(); 
+
             builder.RegisterType<HolidayService>().As<IHolidayService>().InstancePerLifetimeScope();
             builder.RegisterType<OrderNoteService>().As<IOrderNoteService>().InstancePerLifetimeScope();
 

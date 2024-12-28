@@ -6,6 +6,7 @@ using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Shipping;
+using SmartenUP.Core.Services.Shippping;
 using SmartenUP.Core.Util.Extensions;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace SmartenUP.Core.Services
         private readonly IOrderProcessingService _orderProcessingService;
         private readonly IWorkflowMessageService _workflowMessageService;
         private readonly IWorkContext _workContext;
-        private readonly IShippingService _shippingService;
+        private readonly ISUPShippingService _supShippingService;
         private readonly IHolidayService _holidayService;
         private readonly ILogger _logger;
         public OrderNoteService(
@@ -28,7 +29,7 @@ namespace SmartenUP.Core.Services
             IOrderProcessingService orderProcessingService,
             IWorkflowMessageService workflowMessageService,
             IWorkContext workContext,
-            IShippingService shippingService,
+            ISUPShippingService shippingService,
             IHolidayService holidayService,
             ILogger logger)
         {
@@ -36,7 +37,7 @@ namespace SmartenUP.Core.Services
             _orderService = orderService;
             _orderProcessingService = orderProcessingService;
             _workflowMessageService = workflowMessageService;
-            _shippingService = shippingService;
+            _supShippingService = shippingService;
             _holidayService = holidayService;
             _logger = logger;
         }
@@ -89,7 +90,7 @@ namespace SmartenUP.Core.Services
             {
                 try
                 {
-                    var shippingOption = _shippingService.GetShippingOption(order);
+                    var shippingOption = _supShippingService.GetShippingOption(order);
 
                     str.AppendFormat("Correios: {0} - {1} após a postagem", shippingOption.Name, shippingOption.Description);
                     str.AppendLine();
@@ -118,7 +119,7 @@ namespace SmartenUP.Core.Services
 
             foreach (var item in order.OrderItems)
             {
-                var deliveryDateItem = _shippingService.GetDeliveryDateById(item.Product.DeliveryDateId);
+                var deliveryDateItem = _supShippingService.GetDeliveryDateById(item.Product.DeliveryDateId);
 
                 string deliveryDateText = deliveryDateItem.GetLocalized(dd => dd.Name);
 
